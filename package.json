@@ -83,12 +83,11 @@
   "scripts": {
     "vscode:prepublish": "echo Skipping prepublish",
     "compile": "tsc -p ./",
-    "package": "vsce package"
+    "package": "npx @vscode/vsce package"
   },
   "devDependencies": {
     "typescript": "^5.5.0",
     "@types/node": "^20.11.0",
-    "@types/vscode": "^1.85.0",
-    "@vscode/vsce": "^3.7.1"
+    "@types/vscode": "^1.85.0"
   }
 }
