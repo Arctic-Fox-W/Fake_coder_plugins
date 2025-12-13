@@ -1,0 +1,94 @@
+{
+  "name": "vscode-simwrite",
+  "displayName": "TypeReveal",
+  "publisher": "local",
+  "version": "0.0.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/vscode-simwrite"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:simwrite.simulateSelected",
+    "onCommand:simwrite.simulateActive",
+    "onCommand:simwrite.stopSession"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "simwrite.simulateSelected",
+        "title": "模拟写代码打开（资源管理器）"
+      },
+      {
+        "command": "simwrite.simulateActive",
+        "title": "模拟写代码打开（当前文件）"
+      },
+      {
+        "command": "simwrite.stopSession",
+        "title": "结束模拟写代码会话"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "simwrite.simulateSelected",
+          "group": "navigation",
+          "when": "resourceScheme == file"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "simwrite.simulateActive"
+        },
+        {
+          "command": "simwrite.stopSession"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "TypeReveal 设置",
+      "properties": {
+        "simwrite.charactersPerKeystroke": {
+          "type": "number",
+          "default": 1,
+          "minimum": 1,
+          "description": "每次按键显示的字符数"
+        },
+        "simwrite.allowBackspace": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否允许退格回退"
+        },
+        "simwrite.pasteMultiplier": {
+          "type": "number",
+          "default": 1,
+          "minimum": 1,
+          "description": "粘贴显示倍数"
+        },
+        "simwrite.showCompletionMessage": {
+          "type": "boolean",
+          "default": true,
+          "description": "完成显示时是否弹出提示"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "echo Skipping prepublish",
+    "compile": "tsc -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.14.0"
+  }
+}
