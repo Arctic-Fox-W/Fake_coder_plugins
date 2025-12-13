@@ -74,27 +74,12 @@
 
 ## 可视化（示例数据）
 
-```mermaid
-pie title 使用场景占比（示例）
-  "直播演示" : 35
-  "教学"     : 30
-  "宣传拍摄" : 15
-  "舞台演出" : 10
-  "其它"     : 10
-```
+## 统计与图表
 
-```mermaid
-gantt
-    title 工作流与打包流程（示例）
-    dateFormat  X
-    axisFormat  %L
-    section CI
-    安装依赖        :active, 0, 1
-    编译TypeScript  : 1, 1
-    设置版本        : 2, 1
-    打包VSIX        : 3, 1
-    上传构件        : 4, 1
-```
+![Star History](https://api.star-history.com/svg?repos=Arctic-Fox-W/Fake_coder_plugins&type=Date)
+
+[![Repo Card](https://github-readme-stats.vercel.app/api/pin/?username=Arctic-Fox-W&repo=fake_ide)](https://github.com/Arctic-Fox-W/fake_ide)
+[![Repo Card](https://github-readme-stats.vercel.app/api/pin/?username=Arctic-Fox-W&repo=fake_ide)](https://github.com/Arctic-Fox-W/Fake_coder_plugins)
 
 ## 相关链接
 
