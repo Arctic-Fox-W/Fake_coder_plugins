@@ -79,7 +79,7 @@
 ![Star History](https://api.star-history.com/svg?repos=Arctic-Fox-W/Fake_coder_plugins&type=Date)
 
 [![Repo Card](https://github-readme-stats.vercel.app/api/pin/?username=Arctic-Fox-W&repo=fake_ide)](https://github.com/Arctic-Fox-W/fake_ide)
-[![Repo Card](https://github-readme-stats.vercel.app/api/pin/?username=Arctic-Fox-W&repo=fake_ide)](https://github.com/Arctic-Fox-W/Fake_coder_plugins)
+[![Repo Card](https://github-readme-stats.vercel.app/api/pin/?username=Arctic-Fox-W&repo=Fake_coder_plugins)](https://github.com/Arctic-Fox-W/Fake_coder_plugins)
 
 ## 相关链接
 
