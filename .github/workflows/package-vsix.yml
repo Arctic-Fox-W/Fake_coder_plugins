@@ -1,0 +1,35 @@
+name: Package VSIX
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version (e.g., 0.0.2)
+        required: true
+        type: string
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm install
+      - name: Set package.json version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          node -e "const fs=require('fs'); const p='./package.json'; const v=process.env.VERSION; if(!v){console.error('Missing version'); process.exit(1)}; const j=JSON.parse(fs.readFileSync(p,'utf8')); j.version=v; fs.writeFileSync(p, JSON.stringify(j,null,2)+'\n'); console.log('Version set to', v);"
+      - name: Compile
+        run: npm run compile
+      - name: Package VSIX
+        run: npm run package
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-${{ inputs.version }}
+          path: "*.vsix"
