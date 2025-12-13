@@ -72,8 +72,6 @@
 - 只读文件：源文件只用于读取，不会被写入
 - 性能：对超长文件建议适当降低每次按键显示数量或粘贴倍数
 
-## 可视化（示例数据）
-
 ## 统计与图表
 
 ![Star History](https://api.star-history.com/svg?repos=Arctic-Fox-W/Fake_coder_plugins&type=Date)
