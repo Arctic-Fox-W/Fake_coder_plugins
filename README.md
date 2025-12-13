@@ -2,6 +2,14 @@
 
 一个 VS Code 扩展：为任意文件打开“模拟写代码”会话，编辑器初始为空白；您的每次按键会按配置逐步显示源文件真实内容，形成“编码现场”的渐进呈现效果。源文件不会被修改，虚拟文档使用与源文件一致的语言高亮。
 
+## 状态徽章
+
+![License MIT](https://img.shields.io/badge/license-MIT-%234c1)
+![VS Code ^1.85.0](https://img.shields.io/badge/VS%20Code-%5E1.85.0-00aaff)
+![Node >=20](https://img.shields.io/badge/node-%E2%89%A520.0-68a063)
+![TypeScript 5.5](https://img.shields.io/badge/TypeScript-5.5-3178c6)
+![Package with vsce](https://img.shields.io/badge/package-vsce-ff6f00)
+
 ## 特性
 
 - 逐字/逐段显示，可配置每次按键显示数量
@@ -63,6 +71,34 @@
 - 正常编辑行为：在非模拟文档中，输入/删除/粘贴均回退到 VS Code 默认行为
 - 只读文件：源文件只用于读取，不会被写入
 - 性能：对超长文件建议适当降低每次按键显示数量或粘贴倍数
+
+## 可视化（示例数据）
+
+```mermaid
+pie title 使用场景占比（示例）
+  "直播演示" : 35
+  "教学"     : 30
+  "宣传拍摄" : 15
+  "舞台演出" : 10
+  "其它"     : 10
+```
+
+```mermaid
+gantt
+    title 工作流与打包流程（示例）
+    dateFormat  X
+    axisFormat  %L
+    section CI
+    安装依赖        :active, 0, 1
+    编译TypeScript  : 1, 1
+    设置版本        : 2, 1
+    打包VSIX        : 3, 1
+    上传构件        : 4, 1
+```
+
+## 相关链接
+
+- [Fake IDE](https://github.com/Arctic-Fox-W/Fake_IDE)：基于浏览器的轻量“假”IDE，集成 Monaco Editor 的只读展示与逐字揭示，直接模拟完整 IDE 界面实现“模拟写代码”效果，适合影视演出、直播展示与教学场景。
 
 ## 许可证
 
