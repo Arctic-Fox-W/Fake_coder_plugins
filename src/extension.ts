@@ -272,8 +272,35 @@ export function activate(context: vscode.ExtensionContext) {
       if (!editor) return;
       const doc = editor.document;
       const session = (provider as any).getSession(doc.uri);
+      const performNativeDeleteLeft = async () => {
+        const sels = editor.selections;
+        await editor.edit((eb) => {
+          for (const s of sels) {
+            if (!s.isEmpty) {
+              eb.delete(s);
+            } else {
+              const pos = s.active;
+              if (pos.character > 0) {
+                const range = new vscode.Range(
+                  pos.translate(0, -1),
+                  pos
+                );
+                eb.delete(range);
+              } else if (pos.line > 0) {
+                const prevLine = pos.line - 1;
+                const prevEnd = new vscode.Position(
+                  prevLine,
+                  doc.lineAt(prevLine).text.length
+                );
+                const range = new vscode.Range(prevEnd, pos);
+                eb.delete(range);
+              }
+            }
+          }
+        });
+      };
       if (!session) {
-        await vscode.commands.executeCommand("default:deleteLeft");
+        await performNativeDeleteLeft();
         return;
       }
       const cfg = vscode.workspace.getConfiguration("simwrite");
@@ -284,7 +311,7 @@ export function activate(context: vscode.ExtensionContext) {
         const regionEndOffset = anchorOffset + session.revealPos;
         const caretOffset = doc.offsetAt(editor.selection.active);
         if (caretOffset < anchorOffset || caretOffset > regionEndOffset) {
-          await vscode.commands.executeCommand("default:deleteLeft");
+          await performNativeDeleteLeft();
           return;
         }
       }
