@@ -2,7 +2,7 @@
   "name": "vscode-simwrite",
   "displayName": "TypeReveal",
   "publisher": "local",
-  "version": "1.1.0",
+  "version": "1.2.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -20,7 +20,9 @@
     "onCommand:simwrite.stopSession",
     "onCommand:simwrite.simulateSelection",
     "onCommand:simwrite.stealthSimulateSelected",
-    "onCommand:simwrite.stealthSimulateSelection"
+    "onCommand:simwrite.stealthSimulateSelection",
+    "onCommand:simwrite.stopSelectionSession",
+    "onCommand:simwrite.stealthStopSelectionSession"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -48,6 +50,14 @@
       {
         "command": "simwrite.stealthSimulateSelection",
         "title": "选区局部处理"
+      },
+      {
+        "command": "simwrite.stopSelectionSession",
+        "title": "退出模拟写模式"
+      },
+      {
+        "command": "simwrite.stealthStopSelectionSession",
+        "title": "结束局部处理"
       }
     ],
     "menus": {
@@ -73,6 +83,16 @@
           "command": "simwrite.stealthSimulateSelection",
           "group": "navigation",
           "when": "editorHasSelection && config.simwrite.stealthMode"
+        },
+        {
+          "command": "simwrite.stopSelectionSession",
+          "group": "navigation",
+          "when": "simwrite.inSelectionSession && !config.simwrite.stealthMode"
+        },
+        {
+          "command": "simwrite.stealthStopSelectionSession",
+          "group": "navigation",
+          "when": "simwrite.inSelectionSession && config.simwrite.stealthMode"
         }
       ],
       "commandPalette": [

@@ -23,6 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
       (provider as any).startSelectionSession(doc.uri, text, sel.start, doc.languageId);
       const start = sel.start;
       editor.selection = new vscode.Selection(start, start);
+      await vscode.commands.executeCommand("setContext", "simwrite.inSelectionSession", true);
     })
   );
 
@@ -42,6 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
       (provider as any).startSelectionSession(doc.uri, text, sel.start, doc.languageId);
       const start = sel.start;
       editor.selection = new vscode.Selection(start, start);
+      await vscode.commands.executeCommand("setContext", "simwrite.inSelectionSession", true);
     })
   );
 
@@ -94,6 +96,9 @@ export function activate(context: vscode.ExtensionContext) {
           "workbench.action.closeActiveEditor"
         );
       }
+      if (session.inPlace) {
+        await vscode.commands.executeCommand("setContext", "simwrite.inSelectionSession", false);
+      }
     })
   );
 
@@ -103,6 +108,14 @@ export function activate(context: vscode.ExtensionContext) {
       if (session) provider.stopSession(doc.uri);
     })
   );
+
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor(async (ed) => {
+      const v = ed ? (provider as any).getSession(ed.document.uri) : undefined;
+      await vscode.commands.executeCommand("setContext", "simwrite.inSelectionSession", !!(v && v.inPlace));
+    })
+  );
+  vscode.commands.executeCommand("setContext", "simwrite.inSelectionSession", false);
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeTextDocument(async (e) => {
@@ -339,6 +352,20 @@ export function activate(context: vscode.ExtensionContext) {
         }
       }
     )
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("simwrite.stopSelectionSession", async () => {
+      await vscode.commands.executeCommand("simwrite.stopSession");
+      await vscode.commands.executeCommand("setContext", "simwrite.inSelectionSession", false);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("simwrite.stealthStopSelectionSession", async () => {
+      await vscode.commands.executeCommand("simwrite.stopSession");
+      await vscode.commands.executeCommand("setContext", "simwrite.inSelectionSession", false);
+    })
   );
 }
 
