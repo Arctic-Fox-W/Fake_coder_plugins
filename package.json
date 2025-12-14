@@ -18,7 +18,9 @@
     "onCommand:simwrite.simulateSelected",
     "onCommand:simwrite.simulateActive",
     "onCommand:simwrite.stopSession",
-    "onCommand:simwrite.simulateSelection"
+    "onCommand:simwrite.simulateSelection",
+    "onCommand:simwrite.stealthSimulateSelected",
+    "onCommand:simwrite.stealthSimulateSelection"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -38,6 +40,14 @@
       {
         "command": "simwrite.stopSession",
         "title": "结束模拟写代码会话"
+      },
+      {
+        "command": "simwrite.stealthSimulateSelected",
+        "title": "快速预览（资源管理器）"
+      },
+      {
+        "command": "simwrite.stealthSimulateSelection",
+        "title": "选区局部处理"
       }
     ],
     "menus": {
@@ -45,14 +55,24 @@
         {
           "command": "simwrite.simulateSelected",
           "group": "navigation",
-          "when": "resourceScheme == file"
+          "when": "resourceScheme == file && !config.simwrite.stealthMode"
+        },
+        {
+          "command": "simwrite.stealthSimulateSelected",
+          "group": "navigation",
+          "when": "resourceScheme == file && config.simwrite.stealthMode"
         }
       ],
       "editor/context": [
         {
           "command": "simwrite.simulateSelection",
           "group": "navigation",
-          "when": "editorHasSelection"
+          "when": "editorHasSelection && !config.simwrite.stealthMode"
+        },
+        {
+          "command": "simwrite.stealthSimulateSelection",
+          "group": "navigation",
+          "when": "editorHasSelection && config.simwrite.stealthMode"
         }
       ],
       "commandPalette": [
@@ -88,6 +108,11 @@
           "type": "boolean",
           "default": true,
           "description": "完成显示时是否弹出提示"
+        },
+        "simwrite.stealthMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "隐秘模式：右键菜单显示更正常的名称以降低识别度"
         }
       }
     }

@@ -27,8 +27,40 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
+    vscode.commands.registerCommand("simwrite.stealthSimulateSelection", async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) return;
+      const doc = editor.document;
+      if (doc.uri.scheme !== "file") return;
+      const sel = editor.selection;
+      if (sel.isEmpty) return;
+      const text = doc.getText(sel);
+      await editor.edit((eb) => eb.delete(sel), {
+        undoStopBefore: true,
+        undoStopAfter: true,
+      });
+      (provider as any).startSelectionSession(doc.uri, text, sel.start, doc.languageId);
+      const start = sel.start;
+      editor.selection = new vscode.Selection(start, start);
+    })
+  );
+
+  context.subscriptions.push(
     vscode.commands.registerCommand(
       "simwrite.simulateSelected",
+      async (uri: vscode.Uri, uris?: vscode.Uri[]) => {
+        const targets =
+          Array.isArray(uris) && uris.length ? uris : uri ? [uri] : [];
+        for (const u of targets) {
+          await provider.startSession(u);
+        }
+      }
+    )
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "simwrite.stealthSimulateSelected",
       async (uri: vscode.Uri, uris?: vscode.Uri[]) => {
         const targets =
           Array.isArray(uris) && uris.length ? uris : uri ? [uri] : [];
