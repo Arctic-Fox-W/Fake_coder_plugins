@@ -8,6 +8,25 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
+    vscode.commands.registerCommand("simwrite.simulateSelection", async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) return;
+      const doc = editor.document;
+      if (doc.uri.scheme !== "file") return;
+      const sel = editor.selection;
+      if (sel.isEmpty) return;
+      const text = doc.getText(sel);
+      await editor.edit((eb) => eb.delete(sel), {
+        undoStopBefore: true,
+        undoStopAfter: true,
+      });
+      (provider as any).startSelectionSession(doc.uri, text, sel.start, doc.languageId);
+      const start = sel.start;
+      editor.selection = new vscode.Selection(start, start);
+    })
+  );
+
+  context.subscriptions.push(
     vscode.commands.registerCommand(
       "simwrite.simulateSelected",
       async (uri: vscode.Uri, uris?: vscode.Uri[]) => {
@@ -38,9 +57,11 @@ export function activate(context: vscode.ExtensionContext) {
       const session = (provider as any).getSession(doc.uri);
       if (!session) return;
       provider.stopSession(doc.uri);
-      await vscode.commands.executeCommand(
-        "workbench.action.closeActiveEditor"
-      );
+      if (!session.inPlace) {
+        await vscode.commands.executeCommand(
+          "workbench.action.closeActiveEditor"
+        );
+      }
     })
   );
 
@@ -92,17 +113,31 @@ export function activate(context: vscode.ExtensionContext) {
       const prefix = session.content.slice(0, newPos);
       await editor.edit(
         (eb) => {
-          const full = new vscode.Range(
-            doc.positionAt(0),
-            doc.positionAt(doc.getText().length)
-          );
-          eb.replace(full, prefix);
+          if (session.inPlace && session.anchor) {
+            const start = session.anchor;
+            const startOffset = doc.offsetAt(start);
+            const existingEnd = doc.positionAt(startOffset + session.revealPos);
+            const range = new vscode.Range(start, existingEnd);
+            eb.replace(range, prefix);
+          } else {
+            const full = new vscode.Range(
+              doc.positionAt(0),
+              doc.positionAt(doc.getText().length)
+            );
+            eb.replace(full, prefix);
+          }
         },
         { undoStopBefore: false, undoStopAfter: false }
       );
       session.revealPos = newPos;
-      const end = doc.positionAt(session.revealPos);
-      editor.selection = new vscode.Selection(end, end);
+      if (session.inPlace && session.anchor) {
+        const startOffset = doc.offsetAt(session.anchor);
+        const end = doc.positionAt(startOffset + session.revealPos);
+        editor.selection = new vscode.Selection(end, end);
+      } else {
+        const end = doc.positionAt(session.revealPos);
+        editor.selection = new vscode.Selection(end, end);
+      }
       session.applyingEdit = false;
       if (session.revealPos >= session.content.length && showMsg) {
         vscode.window.showInformationMessage("已全部显示");
@@ -123,7 +158,7 @@ export function activate(context: vscode.ExtensionContext) {
       const cfg = vscode.workspace.getConfiguration("simwrite");
       const perStroke = cfg.get<number>("charactersPerKeystroke", 1);
       const showMsg = cfg.get<boolean>("showCompletionMessage", true);
-      const inc = Math.max(perStroke, 1);
+      const inc = (session.inPlace ? 1 : Math.max(perStroke, 1));
       const newPos = Math.max(
         0,
         Math.min(session.content.length, session.revealPos + inc)
@@ -132,17 +167,31 @@ export function activate(context: vscode.ExtensionContext) {
       session.applyingEdit = true;
       await editor.edit(
         (eb) => {
-          const full = new vscode.Range(
-            doc.positionAt(0),
-            doc.positionAt(doc.getText().length)
-          );
-          eb.replace(full, prefix);
+          if (session.inPlace && session.anchor) {
+            const start = session.anchor;
+            const startOffset = doc.offsetAt(start);
+            const existingEnd = doc.positionAt(startOffset + session.revealPos);
+            const range = new vscode.Range(start, existingEnd);
+            eb.replace(range, prefix);
+          } else {
+            const full = new vscode.Range(
+              doc.positionAt(0),
+              doc.positionAt(doc.getText().length)
+            );
+            eb.replace(full, prefix);
+          }
         },
         { undoStopBefore: false, undoStopAfter: false }
       );
       session.revealPos = newPos;
-      const end = doc.positionAt(session.revealPos);
-      editor.selection = new vscode.Selection(end, end);
+      if (session.inPlace && session.anchor) {
+        const startOffset = doc.offsetAt(session.anchor);
+        const end = doc.positionAt(startOffset + session.revealPos);
+        editor.selection = new vscode.Selection(end, end);
+      } else {
+        const end = doc.positionAt(session.revealPos);
+        editor.selection = new vscode.Selection(end, end);
+      }
       session.applyingEdit = false;
       if (session.revealPos >= session.content.length && showMsg) {
         vscode.window.showInformationMessage("已全部显示");
@@ -169,17 +218,31 @@ export function activate(context: vscode.ExtensionContext) {
       session.applyingEdit = true;
       await editor.edit(
         (eb) => {
-          const full = new vscode.Range(
-            doc.positionAt(0),
-            doc.positionAt(doc.getText().length)
-          );
-          eb.replace(full, prefix);
+          if (session.inPlace && session.anchor) {
+            const start = session.anchor;
+            const startOffset = doc.offsetAt(start);
+            const existingEnd = doc.positionAt(startOffset + session.revealPos);
+            const range = new vscode.Range(start, existingEnd);
+            eb.replace(range, prefix);
+          } else {
+            const full = new vscode.Range(
+              doc.positionAt(0),
+              doc.positionAt(doc.getText().length)
+            );
+            eb.replace(full, prefix);
+          }
         },
         { undoStopBefore: false, undoStopAfter: false }
       );
       session.revealPos = newPos;
-      const end = doc.positionAt(session.revealPos);
-      editor.selection = new vscode.Selection(end, end);
+      if (session.inPlace && session.anchor) {
+        const startOffset = doc.offsetAt(session.anchor);
+        const end = doc.positionAt(startOffset + session.revealPos);
+        editor.selection = new vscode.Selection(end, end);
+      } else {
+        const end = doc.positionAt(session.revealPos);
+        editor.selection = new vscode.Selection(end, end);
+      }
       session.applyingEdit = false;
       if (session.revealPos >= session.content.length && showMsg) {
         vscode.window.showInformationMessage("已全部显示");
@@ -213,17 +276,31 @@ export function activate(context: vscode.ExtensionContext) {
         session.applyingEdit = true;
         await editor.edit(
           (eb) => {
-            const full = new vscode.Range(
-              doc.positionAt(0),
-              doc.positionAt(doc.getText().length)
-            );
-            eb.replace(full, prefix);
+            if (session.inPlace && session.anchor) {
+              const start = session.anchor;
+              const startOffset = doc.offsetAt(start);
+              const existingEnd = doc.positionAt(startOffset + session.revealPos);
+              const range = new vscode.Range(start, existingEnd);
+              eb.replace(range, prefix);
+            } else {
+              const full = new vscode.Range(
+                doc.positionAt(0),
+                doc.positionAt(doc.getText().length)
+              );
+              eb.replace(full, prefix);
+            }
           },
           { undoStopBefore: false, undoStopAfter: false }
         );
         session.revealPos = newPos;
-        const end = doc.positionAt(session.revealPos);
-        editor.selection = new vscode.Selection(end, end);
+        if (session.inPlace && session.anchor) {
+          const startOffset = doc.offsetAt(session.anchor);
+          const end = doc.positionAt(startOffset + session.revealPos);
+          editor.selection = new vscode.Selection(end, end);
+        } else {
+          const end = doc.positionAt(session.revealPos);
+          editor.selection = new vscode.Selection(end, end);
+        }
         session.applyingEdit = false;
         if (session.revealPos >= session.content.length && showMsg) {
           vscode.window.showInformationMessage("已全部显示");

@@ -16,4 +16,5 @@ pnpm-debug.log*
 .env
 .env.*
 Thumbs.db
-.DS_Store
+node20/
+node20.zip

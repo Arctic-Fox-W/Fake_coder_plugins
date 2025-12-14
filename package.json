@@ -2,7 +2,7 @@
   "name": "vscode-simwrite",
   "displayName": "TypeReveal",
   "publisher": "local",
-  "version": "0.0.1",
+  "version": "1.1.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -17,7 +17,8 @@
   "activationEvents": [
     "onCommand:simwrite.simulateSelected",
     "onCommand:simwrite.simulateActive",
-    "onCommand:simwrite.stopSession"
+    "onCommand:simwrite.stopSession",
+    "onCommand:simwrite.simulateSelection"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -25,6 +26,10 @@
       {
         "command": "simwrite.simulateSelected",
         "title": "模拟写代码打开（资源管理器）"
+      },
+      {
+        "command": "simwrite.simulateSelection",
+        "title": "模拟写代码（选区）"
       },
       {
         "command": "simwrite.simulateActive",
@@ -41,6 +46,13 @@
           "command": "simwrite.simulateSelected",
           "group": "navigation",
           "when": "resourceScheme == file"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "simwrite.simulateSelection",
+          "group": "navigation",
+          "when": "editorHasSelection"
         }
       ],
       "commandPalette": [

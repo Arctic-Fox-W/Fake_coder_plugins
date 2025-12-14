@@ -25,6 +25,13 @@ export class SimWriteProvider implements vscode.TextDocumentContentProvider {
     await vscode.window.showTextDocument(simDoc, { preview: false });
   }
 
+  startSelectionSession(targetUri: vscode.Uri, text: string, anchor: vscode.Position, languageId: string): void {
+    const session = new SimSession(targetUri, languageId, text);
+    session.inPlace = true;
+    session.anchor = anchor;
+    this.sessions.set(targetUri.toString(), session);
+  }
+
   stopSession(simUri: vscode.Uri): void {
     this.sessions.delete(simUri.toString());
   }
