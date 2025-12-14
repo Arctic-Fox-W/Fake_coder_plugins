@@ -135,11 +135,20 @@ export function activate(context: vscode.ExtensionContext) {
       session.applyingEdit = true;
       let inc = 0;
       let dec = 0;
+      const anchorOffset = session.inPlace && session.anchor ? doc.offsetAt(session.anchor) : 0;
+      const regionEndOffset = session.inPlace && session.anchor ? anchorOffset + session.revealPos : doc.getText().length;
       for (const change of e.contentChanges) {
         const rangeLength =
           (change as any).rangeLength ??
           doc.offsetAt(change.range.end) - doc.offsetAt(change.range.start);
         const inserted = change.text.length;
+        const changeStart = doc.offsetAt(change.range.start);
+        const changeEnd = doc.offsetAt(change.range.end);
+        const intersectsRegion =
+          changeEnd > anchorOffset && changeStart <= regionEndOffset;
+        if (!intersectsRegion && session.inPlace) {
+          continue;
+        }
         if (inserted > 0) {
           const isPaste = inserted > 1;
           inc += isPaste ? inserted * pasteMultiplier : inserted * perStroke;
@@ -150,6 +159,10 @@ export function activate(context: vscode.ExtensionContext) {
       }
       if (!allowBackspace) {
         dec = 0;
+      }
+      if (inc === 0 && dec === 0) {
+        session.applyingEdit = false;
+        return;
       }
       const newPos = Math.max(
         0,
@@ -203,6 +216,15 @@ export function activate(context: vscode.ExtensionContext) {
       const cfg = vscode.workspace.getConfiguration("simwrite");
       const perStroke = cfg.get<number>("charactersPerKeystroke", 1);
       const showMsg = cfg.get<boolean>("showCompletionMessage", true);
+      if (session.inPlace && session.anchor) {
+        const anchorOffset = doc.offsetAt(session.anchor);
+        const regionEndOffset = anchorOffset + session.revealPos;
+        const caretOffset = doc.offsetAt(editor.selection.active);
+        if (caretOffset < anchorOffset || caretOffset > regionEndOffset) {
+          await vscode.commands.executeCommand("default:type", args);
+          return;
+        }
+      }
       const inc = (session.inPlace ? 1 : Math.max(perStroke, 1));
       const newPos = Math.max(
         0,
@@ -257,6 +279,15 @@ export function activate(context: vscode.ExtensionContext) {
       const cfg = vscode.workspace.getConfiguration("simwrite");
       const allowBackspace = cfg.get<boolean>("allowBackspace", true);
       const showMsg = cfg.get<boolean>("showCompletionMessage", true);
+      if (session.inPlace && session.anchor) {
+        const anchorOffset = doc.offsetAt(session.anchor);
+        const regionEndOffset = anchorOffset + session.revealPos;
+        const caretOffset = doc.offsetAt(editor.selection.active);
+        if (caretOffset < anchorOffset || caretOffset > regionEndOffset) {
+          await vscode.commands.executeCommand("default:deleteLeft");
+          return;
+        }
+      }
       if (!allowBackspace) return;
       const newPos = Math.max(0, session.revealPos - 1);
       const prefix = session.content.slice(0, newPos);
@@ -312,6 +343,15 @@ export function activate(context: vscode.ExtensionContext) {
         const pasteMultiplier = cfg.get<number>("pasteMultiplier", 1);
         const showMsg = cfg.get<boolean>("showCompletionMessage", true);
         const text = await vscode.env.clipboard.readText();
+        if (session.inPlace && session.anchor) {
+          const anchorOffset = doc.offsetAt(session.anchor);
+          const regionEndOffset = anchorOffset + session.revealPos;
+          const caretOffset = doc.offsetAt(editor.selection.active);
+          if (caretOffset < anchorOffset || caretOffset > regionEndOffset) {
+            await vscode.commands.executeCommand("default:type", { text });
+            return;
+          }
+        }
         const inc = Math.max(1, text.length * Math.max(1, pasteMultiplier));
         const newPos = Math.max(
           0,
